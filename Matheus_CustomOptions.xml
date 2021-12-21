@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Matheus_CustomOptions>
+			<active>true</active>
+			<codePool>community</codePool>
+		</Matheus_CustomOptions>
+	</modules>
+</config>
