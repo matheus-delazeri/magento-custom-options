@@ -10,10 +10,10 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
         $loader_gif = "https://i.gifer.com/origin/b4/b4d657e7ef262b88eb5f7ac021edda87.gif";
 
         $block_content = "
-        <h2>Opções personalizadas</h2>
-        <h4>Adicione opções personalizadas a produtos de uma categoria</h4>
-        <h2>Geral</h2>
-            <h4>Categoria onde os produtos se encontram:</h4>
+        <h2>Custom options</h2>
+        <h4>Add custom options in all products from a selected category.</h4>
+        <h2>General</h2>
+            <h4>Select the category:</h4>
             <select id='category'>";
 
         foreach ($categories as $id => $category) {
@@ -24,37 +24,37 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
             <br><br>
             <div style='display: flex; width: 100%'>
                 <div style='width: 10%'>
-                    <h4>Título</h4>
+                    <h4>Title</h4>
                     <input type='text' id='title' style='width: 70%'>
                 </div>
                 <div style='width: 10%'>
-                    <h4>Tipo de campo:</h4>
+                    <h4>Input Type:</h4>
                     <select id='field_type'>
-                        <optgroup label='Texto'>
-                            <option value='field'>Campo</option>
-                            <option value='area'>Área</option>
+                        <optgroup label='Text'>
+                            <option value='field'>Field</option>
+                            <option value='area'>Area</option>
                         </optgroup>
-                        <optgroup label='Arquivo'>
-                            <option value='file'>Arquivo</option>
+                        <optgroup label='File'>
+                            <option value='file'>File</option>
                         </optgroup>
-                        <optgroup label='Selecionar'>
-                            <option value='drop_down'>Combobox</option>
+                        <optgroup label='Select'>
+                            <option value='drop_down'>Drop-down</option>
                             <option value='radio'>Radio Buttons</option>
                             <option value='checkbox'>Checkbox</option>
-                            <option value='multiple'>Múltiplas Seleções</option>
+                            <option value='multiple'>Multiple Select</option>
                         </optgroup>
-                        <optgroup label='Data'>
-                            <option value='date'>Data</option>
-                            <option value='date_time'>Data &amp; Hora</option>
-                            <option value='time'>Hora</option>
+                        <optgroup label='Date'>
+                            <option value='date'>Date</option>
+                            <option value='date_time'>Date &amp; Time</option>
+                            <option value='time'>Time</option>
                         </optgroup>
                     </select>
                 </div>
                 <div style='width: 10%'>
-                    <h4>Obrigatório?</h4>
+                    <h4>Is required?</h4>
                     <select id='is_require'>
-                        <option value='1'>Sim</option>
-                        <option value='0'>Não</option>
+                        <option value='1'>Yes</option>
+                        <option value='0'>No</option>
                     </select>
                 </div>
             </div>
@@ -63,19 +63,19 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
                 <table>
                     <thead>
                         <tr>
-                            <th>Título</th>
-                            <th>Preço</th>
-                            <th>Tipo de Preço</th>
-                            <th>Ordem</th>
+                            <th>Title</th>
+                            <th>Price</th>
+                            <th>Price Type</th>
+                            <th>Sort Order</th>
                         </tr>
                     </thead>
                     <tbody id='custom-options'></tbody>
                 </table>
             </div>
             <br>
-            <div id='add-line'>+ Linha</div>
+            <div id='add-line'>+ Line</div>
             <br><br>
-            <input type='submit' class='btn-default' id='start' value='Começar'>
+            <input type='submit' class='btn-default' id='start' value='Start'>
             <br><br>
             <div style='border:1px solid #ccc; border-radius: 5px; padding: 1% 2%; width: 20%; display: none;' id='log-div'>
                 <div style='width: 80%;' id='progress'></div>
@@ -94,6 +94,9 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
                 function arrayToString(class_name){
                     el_str = '';
                     var elements = document.getElementsByClassName(class_name);
+                    if(elements.lenght == 0){
+                        return 'null';
+                    }
                     for(var i = 0; i < elements.length; i++){
                         el_str += $(elements[i]).val() + ';';
                     }
@@ -128,11 +131,11 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
                         <td style='width: 20%'><input type='text' class='option_prices'></td>
                         <td>
                             <select class='option_price_types'>
-                                <option value='fixed'>Fixo</option>
-                                <option value='percentage'>Porcentagem</option>
+                                <option value='fixed'>Fixed</option>
+                                <option value='percentage'>Percentage</option>
                             </select>
                         </td>
-                        <td style='width: 10%'><input type='text' class='option_orders' style='width: 50%'></td>
+                        <td style='width: 15%'><input type='text' class='option_orders' style='width: 30%'></td>
                         <td class='btn-del' onclick='deleteRow(this)'><b>X</b></td>
                         </tr>
                     `);

@@ -25,7 +25,7 @@ class Matheus_CustomOptions_StartController extends Mage_Adminhtml_Controller_Ac
 		if ($options['title'] == '') {
 ?>
 			<script>
-				parent.document.getElementById("progress").innerHTML = "[<?php echo date('H:i:s') ?>] O campo <b>Título</b> não pode ser vazio.</p>";
+				parent.document.getElementById("progress").innerHTML = "[<?php echo date('H:i:s') ?>] Field <b>Title</b> can't be empty.</p>";
 				parent.document.getElementById("loader").innerHTML = "";
 			</script>
 		<?php
@@ -49,17 +49,18 @@ class Matheus_CustomOptions_StartController extends Mage_Adminhtml_Controller_Ac
 			}
 		?>
 			<script>
-				parent.document.getElementById("progress").innerHTML = "[<?php echo date('H:i:s'); ?>] Produtos atualizados <b>[<?php echo $p_count; ?>]</b></p>";
+				parent.document.getElementById("progress").innerHTML = "[<?php echo date('H:i:s'); ?>] Updated products <b>[<?php echo $p_count; ?>]</b></p>";
 			</script>
 		<?php
 		}
 		$this->display_log();
+		$_cat = Mage::getModel('catalog/category')->load($options['category']);
 		?>
 		<script>
-			parent.document.getElementById("progress").innerHTML += "[<?php echo date('H:i:s'); ?>] Processo finalizado!</p>";
+			parent.document.getElementById("progress").innerHTML += "[<?php echo date('H:i:s'); ?>] All products from <b><?php echo $_cat->getName(); ?></b> updated!</p>";
 			parent.document.getElementById("loader").innerHTML = "";
 		</script>
-<?php
+		<?php
 		$this->display_log();
 		ob_end_clean();
 	}
@@ -86,19 +87,19 @@ class Matheus_CustomOptions_StartController extends Mage_Adminhtml_Controller_Ac
 	private function getCustomOptions($options)
 	{
 		$custom_options = array();
-		$titles = $this->breakStrInArray($options['option_titles']);
+		$titles = $options['option_titles'] == '' ? null : $this->breakStrInArray($options['option_titles']);
+		if ($titles == null) {
+		?>
+			<script>
+				parent.document.getElementById("progress").innerHTML = "[<?php echo date('H:i:s') ?>] Add at least one line.</p>";
+				parent.document.getElementById("loader").innerHTML = "";
+			</script>
+<?php
+			exit(0);
+		}
 		$prices = $this->breakStrInArray($options['option_prices']);
 		$price_types = $this->breakStrInArray($options['option_price_types']);
 		$orders = $this->breakStrInArray($options['option_orders']);
-		if(sizeof($titles)==0) {
-			?>
-			<script>
-				parent.document.getElementById("progress").innerHTML = "[<?php echo date('H:i:s') ?>] Nenhuma linha adicionada.</p>";
-				parent.document.getElementById("loader").innerHTML = "";
-			</script>
-		<?php
-			exit(0);
-		}
 		for ($i = 0; $i < sizeof($titles); $i++) {
 			array_push($custom_options, array(
 				'title' => $titles[$i],
@@ -112,7 +113,12 @@ class Matheus_CustomOptions_StartController extends Mage_Adminhtml_Controller_Ac
 	private function breakStrInArray($str)
 	{
 		$limiter = ";";
-		return explode($limiter, $str);
+		$arr = explode($limiter, $str);
+		if (sizeof($arr) > 0) {
+			return $arr;
+		} else {
+			return 0;
+		}
 	}
 	function display_log()
 	{
