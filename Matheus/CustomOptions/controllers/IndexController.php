@@ -4,32 +4,32 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
 {
     public function indexAction()
     {
-        $url = $this->getUrl('custom_options/start/index');
-        $urlValue = Mage::getSingleton('core/session')->getFormKey();
+        $start_url = $this->getUrl('custom_options/start/index');
+        $temp_url = $this->getUrl('custom_options/temp/index');
         $categories = $this->getCategories();
+        $loader_gif = "https://i.gifer.com/origin/b4/b4d657e7ef262b88eb5f7ac021edda87.gif";
 
         $block_content = "
         <h2>Opções personalizadas</h2>
         <h4>Adicione opções personalizadas a produtos de uma categoria</h4>
         <h2>Geral</h2>
-        <form action='$url' method='post'>
             <h4>Categoria onde os produtos se encontram:</h4>
-            <select name='categories'>";
-            
-        foreach($categories as $id=>$category){
+            <select id='category'>";
+
+        foreach ($categories as $id => $category) {
             $block_content .= "<option value='$id'>$category</option>";
-        }     
+        }
         $block_content .= "
             </select>
             <br><br>
             <div style='display: flex; width: 100%'>
                 <div style='width: 10%'>
                     <h4>Título</h4>
-                    <input type='text' name='title' style='width: 70%'>
+                    <input type='text' id='title' style='width: 70%'>
                 </div>
                 <div style='width: 10%'>
                     <h4>Tipo de campo:</h4>
-                    <select name='field_type'>
+                    <select id='field_type'>
                         <optgroup label='Texto'>
                             <option value='field'>Campo</option>
                             <option value='area'>Área</option>
@@ -52,7 +52,7 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
                 </div>
                 <div style='width: 10%'>
                     <h4>Obrigatório?</h4>
-                    <select name='is_require'>
+                    <select id='is_require'>
                         <option value='1'>Sim</option>
                         <option value='0'>Não</option>
                     </select>
@@ -73,11 +73,15 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
                 </table>
             </div>
             <br>
-            <div id='add-line'>+ LINHA</div>
+            <div id='add-line'>+ Linha</div>
             <br><br>
-            <input type='hidden' name='form_key' value='$urlValue'>
-            <input type='submit' class='btn-default' id='submit' value='Começar'>
-        </form>
+            <input type='submit' class='btn-default' id='start' value='Começar'>
+            <br><br>
+            <div style='border:1px solid #ccc; border-radius: 5px; padding: 1% 2%; width: 20%; display: none;' id='log-div'>
+                <div style='width: 80%;' id='progress'></div>
+                <div style='width: 20%;' id='loader'></div>
+            </div>
+            <iframe id='loadarea' style='display:none;'></iframe><br />
         <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
         <script>
             jQuery.noConflict();
@@ -85,19 +89,50 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
                     var row = source.parentNode;
                     row.remove();
             }
+            
             jQuery(function ($) {
+                function arrayToString(class_name){
+                    el_str = '';
+                    var elements = document.getElementsByClassName(class_name);
+                    for(var i = 0; i < elements.length; i++){
+                        el_str += $(elements[i]).val() + ';';
+                    }
+                    return el_str.slice(0, -1);
+                }
+                $('#start').click(function(){
+                    $('#log-div').css('display', 'flex');
+                    $('#progress').empty();
+                    $('#loader').append(`<img src='$loader_gif' style='float: right; width: 35%'>`);
+                    new Ajax.Request('$temp_url', {
+                        method: 'Post',
+                        parameters: {
+                            'category' : $('#category').val(),   
+                            'title' : $('#title').val(),   
+                            'field_type' : $('#field_type').val(),   
+                            'is_require' : $('#is_require').val(),
+                            'option_titles' : arrayToString('option_titles'),
+                            'option_prices' : arrayToString('option_prices'),
+                            'option_price_types' : arrayToString('option_price_types'),
+                            'option_orders' : arrayToString('option_orders'),
+                        },
+                        onComplete: function(transport) {
+                            document.getElementById('loadarea').src = '$start_url';
+                        }
+                    });
+                });
+
                 $('#add-line').click(function(){
                     $('#custom-options').append(`
                         <tr>
-                        <td><input type='text' name='option_titles[]'></td>
-                        <td><input type='text' name='option_prices[]'></td>
+                        <td><input type='text' class='option_titles'></td>
+                        <td style='width: 20%'><input type='text' class='option_prices'></td>
                         <td>
-                            <select name='option_price_types[]'>
+                            <select class='option_price_types'>
                                 <option value='fixed'>Fixo</option>
                                 <option value='percentage'>Porcentagem</option>
                             </select>
                         </td>
-                        <td><input type='text' name='option_orders[]'></td>
+                        <td style='width: 10%'><input type='text' class='option_orders' style='width: 50%'></td>
                         <td class='btn-del' onclick='deleteRow(this)'><b>X</b></td>
                         </tr>
                     `);
@@ -133,10 +168,14 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
         table {
             width: 100%;
         }
+        tbody {
+            text-align: center;
+        }
         th {
             border: 1px solid #333;
             text-align: center;
             padding: 1%;
+            white-space: nowrap;
         }
         td {
             border: 1px solid #333;
@@ -158,7 +197,7 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
         #add-line:hover {
             cursor: pointer;
         }
-        </style>"; 
+        </style>";
         $this->loadLayout();
 
         $this->_setActiveMenu('catalog/matheus');
@@ -170,18 +209,19 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
         $this->renderLayout();
     }
 
-    private function getCategories(){
+    private function getCategories()
+    {
         $category = Mage::getModel('catalog/category');
-		$catTree = $category->getTreeModel()->load();
-		$catIds = $catTree->getCollection()->getAllIds();
-		if ($catIds){
+        $catTree = $category->getTreeModel()->load();
+        $catIds = $catTree->getCollection()->getAllIds();
+        if ($catIds) {
             $catNames = array();
-			foreach ($catIds as $id){
-				$cat = Mage::getModel('catalog/category');
-				$cat->load($id);
+            foreach ($catIds as $id) {
+                $cat = Mage::getModel('catalog/category');
+                $cat->load($id);
                 $catNames[$id] = $cat->getName();
-			} 
+            }
             return $catNames;
-		} 
+        }
     }
 }
