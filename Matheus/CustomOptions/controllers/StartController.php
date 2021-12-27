@@ -17,9 +17,18 @@ class Matheus_CustomOptions_StartController extends Mage_Adminhtml_Controller_Ac
 	{
 		$this->display_log();
 		/** Get data */
-		if (is_file("temp.json")) {
+		$options = array();
+		if (is_file(__DIR__."/../temp/temp.json")) {
 			$options = json_decode(file_get_contents(__DIR__ . "/../temp/temp.json"), true);
 			unlink(__DIR__ . "/../temp/temp.json");
+		} else {
+			?>
+			<script>
+				parent.document.getElementById("progress").innerHTML = "[<?php echo date('H:i:s') ?>] temp.json not created.</p>";
+				parent.document.getElementById("loader").innerHTML = "";
+			</script>
+		<?php
+			exit(0);
 		}
 		$p_count = 0;
 		if ($options['title'] == '') {

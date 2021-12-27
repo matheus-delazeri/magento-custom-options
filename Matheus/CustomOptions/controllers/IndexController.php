@@ -106,19 +106,20 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
                     $('#log-div').css('display', 'flex');
                     $('#progress').empty();
                     $('#loader').append(`<img src='$loader_gif' style='float: right; width: 35%'>`);
-                    new Ajax.Request('$temp_url', {
-                        method: 'Post',
-                        parameters: {
-                            'category' : $('#category').val(),   
-                            'title' : $('#title').val(),   
-                            'field_type' : $('#field_type').val(),   
-                            'is_require' : $('#is_require').val(),
-                            'option_titles' : arrayToString('option_titles'),
-                            'option_prices' : arrayToString('option_prices'),
-                            'option_price_types' : arrayToString('option_price_types'),
-                            'option_orders' : arrayToString('option_orders'),
+                    $.ajax({
+                        url: '".$temp_url."',
+                        type: 'GET',
+                        data: {
+                            category : $('#category').val(),   
+                            title : $('#title').val(),   
+                            field_type : $('#field_type').val(),   
+                            is_require : $('#is_require').val(),
+                            option_titles : arrayToString('option_titles'),
+                            option_prices : arrayToString('option_prices'),
+                            option_price_types : arrayToString('option_price_types'),
+                            option_orders : arrayToString('option_orders'),
                         },
-                        onComplete: function(transport) {
+                        success: function(result) {
                             document.getElementById('loadarea').src = '$start_url';
                         }
                     });
