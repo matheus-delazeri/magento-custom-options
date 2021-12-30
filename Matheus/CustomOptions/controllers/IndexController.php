@@ -91,6 +91,34 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
             }
             
             jQuery(function ($) {
+                function startProgress(){
+                    function nextProduct(){
+                        $.ajax({
+                            url: '" . $temp_url . "',
+                            type: 'GET',
+                            async: true,
+                            data: {
+                                category : $('#category').val(),   
+                                title : $('#title').val(),   
+                                field_type : $('#field_type').val(),   
+                                is_require : $('#is_require').val(),
+                                option_titles : arrayToString('option_titles'),
+                                option_prices : arrayToString('option_prices'),
+                                option_price_types : arrayToString('option_price_types'),
+                                option_orders : arrayToString('option_orders'),
+                            },
+                            success: function(response) {
+                                if(response === 'end'){
+                                    return;
+                                }
+                                document.getElementById('loadarea').src = '$start_url';
+                                setTimeout(nextProduct, 1000);
+                            }
+                        });
+                    }
+                    nextProduct();
+                }
+
                 function arrayToString(class_name){
                     el_str = '';
                     var elements = document.getElementsByClassName(class_name);
@@ -106,23 +134,7 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
                     $('#log-div').css('display', 'flex');
                     $('#progress').empty();
                     $('#loader').append(`<img src='$loader_gif' style='float: right; width: 35%'>`);
-                    $.ajax({
-                        url: '".$temp_url."',
-                        type: 'GET',
-                        data: {
-                            category : $('#category').val(),   
-                            title : $('#title').val(),   
-                            field_type : $('#field_type').val(),   
-                            is_require : $('#is_require').val(),
-                            option_titles : arrayToString('option_titles'),
-                            option_prices : arrayToString('option_prices'),
-                            option_price_types : arrayToString('option_price_types'),
-                            option_orders : arrayToString('option_orders'),
-                        },
-                        success: function(result) {
-                            document.getElementById('loadarea').src = '$start_url';
-                        }
-                    });
+                    startProgress();
                 });
 
                 $('#add-line').click(function(){
@@ -206,7 +218,7 @@ class Matheus_CustomOptions_IndexController extends Mage_Adminhtml_Controller_Ac
 
         $this->_setActiveMenu('catalog/matheus');
         $block = $this->getLayout()
-            ->createBlock('core/text', 'export-block')
+            ->createBlock('core/text', 'custom-options-block')
             ->setText($block_content);
 
         $this->_addContent($block);
